@@ -1,0 +1,79 @@
+openapi: 3.0.0
+info:
+  title: Money Account Transactions API
+  version: 1.0.0
+  description: API for retrieving paginated list of money account transactions
+servers:
+  - url: http://api.example.com/v1 # Replace with your server URL
+
+paths:
+  /transactions:
+    get:
+      summary: Get paginated list of money account transactions
+      description: Returns a paginated list of money account transactions for a given customer in a specific calendar month.
+      parameters:
+        - name: Authorization
+          in: header
+          description: JWT Authorization token
+          required: true
+          schema:
+            type: string
+            example: P-0123456789
+        - name: year
+          in: query
+          description: Year and month of the transactions
+          required: true
+          schema:
+            type: integer
+            example: 2310
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionListResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Transactions not found
+        '500':
+          description: Internal Server Error
+
+components:
+  schemas:
+    TransactionListResponse:
+      type: object
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+        totalCredit:
+          type: number
+          format: float
+        totalDebit:
+          type: number
+          format: float
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+        amount:
+          $ref: '#/components/schemas/Amount'
+        accountIBAN:
+          type: string
+        valueDate:
+          type: string
+          format: date
+        description:
+          type: string
+    Amount:
+      type: object
+      properties:
+        currency:
+          type: string
+        value:
+          type: number
+          format: float
